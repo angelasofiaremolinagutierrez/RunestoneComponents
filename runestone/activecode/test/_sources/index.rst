@@ -2830,13 +2830,14 @@ Trying Brython as Python 3 interpreter
 --------------------------------------
 .. activecode:: test_activecode_python3
    :language: python3
-   :python3_interpreter: brython 
+   :python3_interpreter: brython
 
-   print("You can see this print on the browser console")
+   
    from browser import document, alert, html
 
    def hello(ev):
        alert("Hello! I'm using Brython :D")
+       print("You can see this print on the browser console and on the console inside the iframe")
 
    document <= html.BUTTON("My button", id="button_alert")
    document["button_alert"].bind("click", hello)

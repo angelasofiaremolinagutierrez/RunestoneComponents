@@ -5,7 +5,6 @@ export default class BrythonActiveCode extends ActiveCode {
         super(opts);
         opts.alignVertical = true;
         this.python3_interpreter = $(orig).data("python3_interpreter");
-        $(this.runButton).text("Render");
         this.editor.setValue(this.code);
     }
 
@@ -25,10 +24,35 @@ export default class BrythonActiveCode extends ActiveCode {
         <html>
             <head>
                 <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/brython@3.9.0/brython.min.js'></script>
+                <style>
+                    pre {
+                        position: absolute; bottom: 5px; background-color: lightgray; font-size: 13px; line-height: 1.42857143; width: 94%; padding: 9.5px;
+                        color: #333333; word-break: break-all; word-wrap: break-word; border: 1px solid #ccc; border-radius: 4px; overflow: auto;
+                    }
+                </style>
             </head>
             <body onload='brython()'>
-                <script type='text/python'>
-                    ${prog}
+                <pre id="consolePre" style="visibility:hidden"></pre>
+                <script type=text/javascript>
+                if (typeof console  != "undefined") 
+                    if (typeof console.log != 'undefined')
+                        console.olog = console.log;
+                    else
+                        console.olog = function() {};
+            
+                console.log = function(message) {
+                    document.getElementById('consolePre').style.visibility = "visible";
+                    console.olog(message);
+                    if (typeof message == 'object') {
+                        logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+                    } else {
+                        var logger = document.getElementById('consolePre');
+                        logger.innerHTML += message + '</br>';
+                    }
+                };
+                console.error = console.debug = console.info =  console.log
+                </script>
+                <script type='text/python'>${prog}
                 </script>
             </body>
         </html>
