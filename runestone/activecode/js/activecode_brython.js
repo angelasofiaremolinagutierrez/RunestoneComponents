@@ -23,37 +23,67 @@ export default class BrythonActiveCode extends ActiveCode {
         prog = `
         <html>
             <head>
-                <script type='text/javascript' src='https://cdn.jsdelivr.net/npm/brython@3.9.0/brython.min.js'></script>
+                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.4/brython.min.js"></script>
+                <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.4/brython_stdlib.min.js"></script>
+                <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/styles/default.min.css">
+                <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.0.1/highlight.min.js"></script>
                 <style>
                     pre {
-                        position: absolute; bottom: 5px; background-color: lightgray; font-size: 13px; line-height: 1.42857143; width: 94%; padding: 9.5px;
-                        color: #333333; word-break: break-all; word-wrap: break-word; border: 1px solid #ccc; border-radius: 4px; overflow: auto;
+                        position: absolute; bottom: 5px; font-size: 13px; width: 94%; padding: 9.5px; line-height: 1.42857143;
+                    }
+                    code{
+                        border: 1px solid #ccc; border-radius: 4px;
                     }
                 </style>
             </head>
             <body onload='brython()'>
-                <pre id="consolePre" style="visibility:hidden"></pre>
+                <pre id="consolePre">
+                    <code id="consoleCode"></code>
+                </pre>
                 <script type=text/javascript>
-                if (typeof console  != "undefined") 
-                    if (typeof console.log != 'undefined')
+                if (typeof console  != "undefined"){
+                    if (typeof console.log != 'undefined'){
                         console.olog = console.log;
-                    else
+                    }else{
                         console.olog = function() {};
-            
+                    }
+                    if (typeof console.log != 'undefined'){
+                        console.oerr = console.error;
+                    }else{
+                        console.oerr = function() {};
+                    }
+                }
+                
+                var logger = document.getElementById('consoleCode');
+                var preElem = document.getElementById('consolePre');
                 console.log = function(message) {
-                    document.getElementById('consolePre').style.visibility = "visible";
                     console.olog(message);
+                    preElem.style.visibility = "visible";
+                    preElem.style.bottom = "5px";
+                    logger.classList.add("plaintext");
+                    hljs.highlightElement(logger);
                     if (typeof message == 'object') {
                         logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
                     } else {
-                        var logger = document.getElementById('consolePre');
                         logger.innerHTML += message + '</br>';
                     }
                 };
-                console.error = console.debug = console.info =  console.log
+            
+                console.error = function(message) {
+                    console.oerr(message);
+                    preElem.style.visibility = "visible";
+                    preElem.style.top = "5px";
+                    logger.classList.add("python");
+                    hljs.highlightElement(logger);
+                    if (typeof message == 'object') {
+                        logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
+                    } else {
+                        logger.innerHTML += message + '</br>';
+                    }
+                };
+                console.info = console.debug = console.log
                 </script>
-                <script type='text/python'>${prog}
-                </script>
+                <script type='text/python'>${prog}</script>
             </body>
         </html>
         `;
